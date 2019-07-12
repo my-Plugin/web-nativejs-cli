@@ -12,19 +12,11 @@ glob.sync("src/pages/**/*.html");
 const HTMLReg = /(.*\/)*([^.]+).html/;
 const JSReg = /(.*\/)*([^.]+).js/;
 
-let publicPath = "";
-const isProduction = true; // 是否是生产环境
-
-publicPath = "/static/assets";
-// if (!isProduction) {
-//   publicPath = "/static/assets";
-// } else {
-//   // 将 publicPath 设置为线上发布地址
-// }
+let publicPath = "/static/assets";
 
 const html = glob.sync("src/pages/**/*.html").map(path => {
     
-  let name = path.replace(HTMLReg, "$2"); // 从路径中提取出文件名
+  let name = path.replace(HTMLReg, "$2");
   
   return new HtmlWebpackPlugin({
     template: path,
@@ -49,11 +41,10 @@ module.exports = {
     extensions: [ '.tsx', '.ts', '.js' ]
   },
   output: {
-    path: path.resolve(__dirname, "dist"), // 打包后项目 输出到项目根目录下 dist 文件夹
-    filename: "./js/[name].[hash].js" // 输出的 入口JS文件名称
+    path: path.resolve(__dirname, "dist"),
+    filename: "./js/[name].[hash].js"
   },
 
-  // loader 相关配置
   module: {
     rules: [
       {
@@ -89,8 +80,8 @@ module.exports = {
       {
         test: /\.js$/,
         use: ["babel-loader"],
-        exclude: /node_modules/, // 排除不要加载的文件夹
-        include: path.resolve(__dirname, "src") // 指定需要加载的文件夹
+        exclude: /node_modules/,
+        include: path.resolve(__dirname, "src")
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -98,7 +89,7 @@ module.exports = {
           {
             loader: "url-loader",
             options: {
-              limit: 8192, // 文件体积小于 8192kb 时，将被转为 base64 资源
+              limit: 10240,
               name: "[name].[ext]",
               outputPath: "static/assets/",
               publicPath
@@ -113,7 +104,7 @@ module.exports = {
             loader: "url-loader",
             options: {
               name: "[name].[ext]",
-              outputPath: "static/assets/" // 资源 输出路径
+              outputPath: "static/assets/"
             }
           }
         ]
@@ -133,17 +124,14 @@ module.exports = {
     ]
   },
 
-  // 插件 相关配置
   plugins: [
     ...html,
     // 分离 css
     new MinicssExtractPlugin({
       filename: "static/css/[name].[hash:7].css"
     }),
-
     // 压缩分离后的 css
     new Optimizecss(),
-
     // 净化 css
     new PurifycssPlugin({
       paths: glob.sync(path.join(__dirname, "src/**/*.html"))
@@ -153,18 +141,14 @@ module.exports = {
   ],
 
   devServer: {
-    index: "index.html", // 服务器启动的页面（同 html-webpack-plugin 中 filename 选项）; 默认值为 index.html
-    host: "localhost", // 指定host; 默认 localhost
-    port: 3000, // 指定端口号; 默认 8080
-
-    open: true, // 启动本地服务后，自动打开页面
-    compress: true, // 是否启用 gzip 压缩
-    overlay: true, // 编译器错误或警告时, 在浏览器中显示全屏覆盖; 默认false
-    progress: false, // 是否将运行进度输出到控制台; 默认 false
-
-    contentBase: path.resolve(__dirname, "dist"), // 告诉服务器从哪里提供内容。只有在你想要提供静态文件时才需要
-
-    // 精简 终端输出（本地运行时）
+    index: "index.html",
+    host: "0.0.0.0",
+    port: 3000,
+    open: true,
+    compress: true,
+    overlay: true,
+    progress: false,
+    contentBase: path.resolve(__dirname, "dist"),
     stats: {
       modules: false,
       children: false,
