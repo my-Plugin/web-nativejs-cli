@@ -42,9 +42,9 @@
  1. html页面必须放在src/pages目录中
  2. 每个html页面的入口js文件，必须与该html文件名相同
  
-如：src/pages
-        -- home/home.html
-        -- home/home.js
+如：src/pages   
+        -- home/home.html   
+        -- home/home.js   
         
 这是整个脚手架的唯一一处约束，其他资源文件可在 src 目录下任意排布。
 
