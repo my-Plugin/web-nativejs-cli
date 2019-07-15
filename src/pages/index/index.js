@@ -2,8 +2,13 @@
 import "./index.scss";
 
 import $ from 'jquery';
-import print from '../../lib/print';
 
 $("#name").text('text of jquery render');
 
-print('hello, world')
+// 异步模块加载
+// 异步加载的模块代码，将会通过script标签，动态的插入header标签内
+setTimeout(() => {
+  import('./print').then(module => {
+    module.default('hello, world')
+  })
+}, 2000);

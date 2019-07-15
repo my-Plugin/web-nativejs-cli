@@ -14,10 +14,10 @@ const JSReg = /(.*\/)*([^.]+).js/;
 
 let publicPath = "/static/assets";
 
+let htmlNames = [];
 const html = glob.sync("src/pages/**/*.html").map(path => {
-    
   let name = path.replace(HTMLReg, "$2");
-  
+  htmlNames.push(name);
   return new HtmlWebpackPlugin({
     template: path,
     filename: name + ".html",
@@ -26,13 +26,14 @@ const html = glob.sync("src/pages/**/*.html").map(path => {
     inject: true
   });
 });
-
-const entries = glob.sync("src/pages/**/*.js").reduce((prev, next) => {
+const entries = glob.sync("src/pages/**/*.js").filter(path => {
+  const fileName = path.replace(JSReg, "$2");
+  return htmlNames.includes(fileName)
+}).reduce((prev, next) => {
   let name = next.replace(JSReg, "$2");
   prev[name] = "./" + next;
   return prev;
 }, {});
-
 module.exports = {
   mode: "production",
   devtool: '#source-map',
@@ -149,11 +150,13 @@ module.exports = {
     overlay: true,
     progress: false,
     contentBase: path.resolve(__dirname, "dist"),
+    // stats: "normal"
     stats: {
       modules: false,
       children: false,
       chunks: false,
-      chunkModules: false
+      chunkModules: false,
+      entrypoints: false
     }
   },
   optimization: {
