@@ -7,12 +7,9 @@ const PurifycssPlugin = require("purifycss-webpack");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 const glob = require("glob");
-glob.sync("src/pages/**/*.html");
-
 const HTMLReg = /(.*\/)*([^.]+).html/;
 const JSReg = /(.*\/)*([^.]+).js/;
-
-let publicPath = "/static/assets";
+const publicPath = "/static/assets";
 
 let htmlNames = [];
 const html = glob.sync("src/pages/**/*.html").map(path => {
@@ -21,25 +18,28 @@ const html = glob.sync("src/pages/**/*.html").map(path => {
   return new HtmlWebpackPlugin({
     template: path,
     filename: name + ".html",
-    chunks: ["manifest", 'vender', name],
+    chunks: ["manifest", "vender", name],
     chunksSortMode: "dependency",
     inject: true
   });
 });
-const entries = glob.sync("src/pages/**/*.js").filter(path => {
-  const fileName = path.replace(JSReg, "$2");
-  return htmlNames.includes(fileName)
-}).reduce((prev, next) => {
-  let name = next.replace(JSReg, "$2");
-  prev[name] = "./" + next;
-  return prev;
-}, {});
+const entries = glob
+  .sync("src/pages/**/*.js")
+  .filter(path => {
+    const fileName = path.replace(JSReg, "$2");
+    return htmlNames.includes(fileName);
+  })
+  .reduce((prev, next) => {
+    let name = next.replace(JSReg, "$2");
+    prev[name] = "./" + next;
+    return prev;
+  }, {});
 module.exports = {
   mode: "production",
-  devtool: '#source-map',
+  devtool: "#source-map",
   entry: entries,
   resolve: {
-    extensions: [ '.tsx', '.ts', '.js' ]
+    extensions: [".tsx", ".ts", ".js"]
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -143,14 +143,13 @@ module.exports = {
 
   devServer: {
     index: "index.html",
-    host: "0.0.0.0",
+    host: "localhost",
     port: 3000,
     open: true,
     compress: true,
     overlay: true,
     progress: false,
     contentBase: path.resolve(__dirname, "dist"),
-    // stats: "normal"
     stats: {
       modules: false,
       children: false,
@@ -167,7 +166,7 @@ module.exports = {
       cacheGroups: {
         commons: {
           test: /[\\/]node_modules[\\/]/,
-          name: 'vender',
+          name: "vender",
           chunks: "all"
         }
       }
